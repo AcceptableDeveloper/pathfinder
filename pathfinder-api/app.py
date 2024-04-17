@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from bson.json_util import dumps
@@ -7,12 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()  # This loads the variables from .env
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
-
-# Note: Be cautious about posting sensitive credentials like usernames and passwords in your code.
 app.config["MONGO_URI"] = "mongodb+srv://Cluster03209:U1FofkxLXGlE@cluster03209.c4bojqj.mongodb.net/mongodbVSCodePlaygroundDB?retryWrites=true&w=majority"
-
 mongo = PyMongo(app, tlsAllowInvalidCertificates=True)
+
+CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 
 @app.route('/')
 def index():
@@ -23,12 +21,11 @@ def get_data():
     db = mongo.db
     test_collection = db.test
     test_document = test_collection.find()
-    # Use bson.json_util.dumps to serialize the document directly to JSON
     return dumps(test_document), 200, {'Content-Type': 'application/json'}
 
 @app.route('/add')
 def add_user():
-    mydb = mongo["test"]
+    mydb = mongo.db["test"]
     mycol = mydb["test"]
     mycol.insert_one({'name': 'John Doe', 'email': 'john@example.com'})
     return 'User added.'
